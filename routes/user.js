@@ -1,11 +1,14 @@
-const express = require("express");
-const { getPosts, createPosts } = require("../controller/user");
-const { userPostValidator } = require("../validator/user");
+var express = require("express");
+var { allUsers, getUser, updateUser, deleteUser } = require("../controller/user");
+var { requireSignin } = require("../controller/auth");
+var { emailExist } = require("../validator/user");
+var routes = express.Router();
 
-const router = express.Router();
+routes.get("/all", requireSignin, allUsers);
+routes.get("/user/:id", requireSignin, getUser);
+routes.put("/user/:id", requireSignin, emailExist, updateUser);
+routes.delete("/user/:id", requireSignin, deleteUser);
 
-router.get("/", getPosts);
-router.post("/post", userPostValidator, createPosts)
 
-
-module.exports = router;
+// routes.param("userId", userById);
+module.exports = routes;

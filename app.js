@@ -3,8 +3,9 @@ var morgan = require("morgan");
 var dotenv = require("dotenv");
 var mongoose = require("mongoose");
 var bodyParser = require("body-parser");
-// var expressValidator = require("express-validator");
-var getPosts = require("./routes/user");
+var authRoutes = require("./routes/auth");
+var userRoutes = require("./routes/user");
+var cookieParser = require("cookie-parser");
 var app = express();
 dotenv.config();
 
@@ -21,11 +22,19 @@ const applyMiddleware = (req, res, next) => {
 }
 app.use(morgan("dev"));
 app.use(bodyParser.json());
-// app.use(expressValidator());
+app.use(cookieParser());
 app.use(applyMiddleware);
 
 // routes
-app.use("/", getPosts);
+app.use("/", authRoutes);
+app.use("/", userRoutes);
+
+app.use(function (err, req, res, next) {
+    if (err.name === 'UnauthorizedError') {
+        res.status(401).json({ error: "Unauthorized!!" });
+    }
+});
+
 
 // open server
 var port = process.env.PORT;
